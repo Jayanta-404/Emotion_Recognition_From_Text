@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Emotion Recognition System - Deep Learning and Machine Learning powered text sentiment and emotion analysis.">
+  <title>Emotion Recognition System</title>
+  
+  <!-- Modern Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22%20%22100%22><text y=%22.9em%22 font-size=%2290%22>🎭</text></svg>">
+</head>
+<body>
+
+  <!-- Ambient Glow Background Effects -->
+  <div class="ambient-glow ambient-glow-1"></div>
+  <div class="ambient-glow ambient-glow-2"></div>
+
+  <!-- Header Navigation -->
+  <header class="site-header">
+    <div class="container nav-container">
+      <a href="#" class="brand">
+        <div class="brand-icon">🎭</div>
+        <div>
+          <div class="brand-title">EmotionAI</div>
+        </div>
+        <span class="brand-badge">v1.0 Live</span>
+      </a>
+
+      <!-- Navigation Tabs -->
+      <nav class="nav-tabs">
+        <button class="nav-tab-btn active" data-tab="detector">
+          <span>⚡ Live Detector</span>
+        </button>
+        <button class="nav-tab-btn" data-tab="comparison">
+          <span>⚖️ Model Compare</span>
+        </button>
+        <button class="nav-tab-btn" data-tab="batch">
+          <span>📑 Batch Analysis</span>
+        </button>
+        <button class="nav-tab-btn" data-tab="architecture">
+          <span>🧬 Architecture</span>
+        </button>
+      </nav>
+
+      <!-- Live Status Pill & History Toggle -->
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <button id="openHistoryBtn" class="btn-secondary" style="padding: 0.4rem 0.85rem; font-size: 0.82rem;" title="View Recent Analyses">
+          🕒 History (<span id="historyCount">0</span>)
+        </button>
+        <div class="header-status" id="systemStatusBadge">
+          <span class="pulse-dot"></span>
+          <span id="systemStatusText">3 Models Ready</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container">
+      <div class="hero-pill">
+        <span>✨ FastText Embeddings • Conv1D + BiLSTM • TF-IDF Ensemble</span>
+      </div>
+      <h1 class="hero-title">
+        Emotion <span class="hero-gradient-text">Recognition</span> System
+      </h1>
+      <p class="hero-subtitle">
+        Instant emotional sentiment classification across 6 core human affective dimensions, powered by deep dual-branch neural networks and calibrated machine learning models.
+      </p>
+
+      <!-- Emotion Taxonomy Interactive Chips -->
+      <div class="hero-emotions-bar" id="taxonomyBar">
+        <div class="emotion-chip" style="--chip-color: var(--emotion-joy); --chip-glow: var(--emotion-joy-glow);" data-emotion="joy">
+          <span class="chip-emoji">😊</span>
+          <span>Joy</span>
+        </div>
+        <div class="emotion-chip" style="--chip-color: var(--emotion-sadness); --chip-glow: var(--emotion-sadness-glow);" data-emotion="sadness">
+          <span class="chip-emoji">😢</span>
+          <span>Sadness</span>
+        </div>
+        <div class="emotion-chip" style="--chip-color: var(--emotion-anger); --chip-glow: var(--emotion-anger-glow);" data-emotion="anger">
+          <span class="chip-emoji">😡</span>
+          <span>Anger</span>
+        </div>
+        <div class="emotion-chip" style="--chip-color: var(--emotion-fear); --chip-glow: var(--emotion-fear-glow);" data-emotion="fear">
+          <span class="chip-emoji">😨</span>
+          <span>Fear</span>
+        </div>
+        <div class="emotion-chip" style="--chip-color: var(--emotion-love); --chip-glow: var(--emotion-love-glow);" data-emotion="love">
+          <span class="chip-emoji">❤️</span>
+          <span>Love</span>
+        </div>
+        <div class="emotion-chip" style="--chip-color: var(--emotion-surprise); --chip-glow: var(--emotion-surprise-glow);" data-emotion="surprise">
+          <span class="chip-emoji">😲</span>
+          <span>Surprise</span>
+        </div>
+      </div>
+
+      <!-- Quick Metrics Grid -->
+      <div class="metrics-grid">
+        <div class="metric-card" style="--card-accent: var(--purple);">
+          <div class="metric-val" id="metricEmotions">6</div>
+          <div class="metric-label">Target Emotions</div>
+        </div>
+        <div class="metric-card" style="--card-accent: var(--blue);">
+          <div class="metric-val">30,000</div>
+          <div class="metric-label">Vocabulary Features</div>
+        </div>
+        <div class="metric-card" style="--card-accent: var(--cyan);">
+          <div class="metric-val">3 Models</div>
+          <div class="metric-label">Neural & ML Ensembles</div>
+        </div>
+        <div class="metric-card" style="--card-accent: #10b981;">
+          <div class="metric-val" id="lastLatencyVal">&lt; 10 ms</div>
+          <div class="metric-label">Inference Latency</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content Area -->
+  <main class="container">
+
+    <!-- ====================================================================
+         TAB 1: LIVE DETECTOR
+         ==================================================================== -->
+    <div id="tab-detector" class="tab-content active">
+      <div class="detector-layout">
+
+        <!-- Left: Input Card -->
+        <div class="glass-card">
+          <div class="card-header-flex">
+            <h2 class="card-title">
+              <span>✍️ Text Sentiment & Emotion Input</span>
+            </h2>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">
+              Press <kbd style="background: rgba(255,255,255,0.1); padding: 0.15rem 0.4rem; border-radius: 4px; font-family: var(--font-mono);">Ctrl + Enter</kbd> to analyze
+            </div>
+          </div>
+
+          <!-- Model Switcher Bar -->
+          <div class="model-selector-bar">
+            <button class="model-btn active" data-model="keras">
+              <span>🧠 Keras BiLSTM-CNN</span>
+              <span class="badge-rec">Best</span>
+            </button>
+            <button class="model-btn" data-model="logistic">
+              <span>📊 Logistic Regression</span>
+            </button>
+            <button class="model-btn" data-model="svm">
+              <span>⚡ Linear SVM</span>
+            </button>
+            <button class="model-btn" data-model="compare_all">
+              <span>⚖️ Compare All 3</span>
+            </button>
+          </div>
+
+          <!-- Input Textarea with Floating Controls -->
+          <div class="input-wrapper">
+            <textarea 
+              id="emotionTextInput" 
+              class="emotion-textarea" 
+              placeholder="Express yourself or paste any text here... e.g., 'I just got accepted for my dream job! I can't believe it, I am overjoyed!'"
+              spellcheck="false"
+            ></textarea>
+            
+            <div class="input-footer">
+              <span class="char-counter" id="charCountDisplay">0 chars • 0 words</span>
+              <div class="input-actions-floating">
+                <!-- Speech to text button -->
+                <button type="button" class="icon-btn-round" id="micBtn" title="Speak your emotion (Speech-to-Text)">
+                  🎙️
+                </button>
+                <!-- Clear text button -->
+                <button type="button" class="icon-btn-round" id="clearBtn" title="Clear input">
+                  ✖
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Interactive Sample Presets Bar -->
+          <div class="presets-container">
+            <div class="presets-label">
+              <span>Sample Presets</span>
+              <span style="font-size: 0.72rem; cursor: pointer; color: var(--purple);" id="randomSampleBtn">🎲 Randomize</span>
+            </div>
+            <div class="presets-scroll" id="presetsBar">
+              <!-- Dynamically populated or fallback presets -->
+            </div>
+          </div>
+
+          <!-- Control Actions -->
+          <div class="controls-bar">
+            <div class="left-controls">
+              <label class="toggle-label">
+                <div class="toggle-switch">
+                  <input type="checkbox" id="liveAutoAnalyzeToggle">
+                  <span class="toggle-slider"></span>
+                </div>
+                <span>Live auto-analyze</span>
+              </label>
+            </div>
+
+            <div style="display: flex; gap: 0.75rem;">
+              <button class="btn-secondary" id="samplePromptBtn">
+                <span>💡 Example</span>
+              </button>
+              <button class="btn-primary" id="analyzeBtn">
+                <span>Analyze Emotion ✨</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Results Card -->
+        <div class="glass-card" id="resultsContainer">
+          
+          <!-- Empty State (Before First Prediction) -->
+          <div class="results-empty-state" id="emptyState">
+            <div class="empty-icon">💭</div>
+            <h3 class="empty-title">Awaiting Input</h3>
+            <p class="empty-subtitle">
+              Type or select a sample prompt to inspect the emotional probability landscape.
+            </p>
+          </div>
+
+          <!-- Active Single Model Result -->
+          <div class="result-card-active" id="activeResultBox">
+            
+            <!-- Hero Dominant Emotion Box -->
+            <div class="result-hero-box" id="resultHeroBox">
+              <div class="dominant-flex">
+                <div class="dominant-main">
+                  <div class="dominant-emoji" id="resEmoji">😊</div>
+                  <div class="dominant-info">
+                    <h4>Dominant Emotion</h4>
+                    <div class="dominant-name" id="resEmotionName">Joy</div>
+                    <div class="dominant-desc" id="resDesc">Feeling of great happiness and contentment</div>
+                  </div>
+                </div>
+
+                <div class="confidence-gauge-box">
+                  <div class="confidence-big" id="resConfidence">99.8%</div>
+                  <div class="confidence-label">Confidence</div>
+                </div>
+              </div>
+
+              <!-- Secondary Metrics (Valence, Sentiment, Latency) -->
+              <div class="secondary-metrics-bar">
+                <div class="sub-metric-pill">
+                  <div class="sub-metric-title">Sentiment Polarity</div>
+                  <div class="sub-metric-val" id="resSentiment">
+                    <span>Positive</span>
+                  </div>
+                </div>
+                <div class="sub-metric-pill">
+                  <div class="sub-metric-title">Valence Score</div>
+                  <div class="sub-metric-val" id="resValence">+0.85</div>
+                </div>
+                <div class="sub-metric-pill">
+                  <div class="sub-metric-title">Model Used</div>
+                  <div class="sub-metric-val" id="resModelBadge" style="font-size: 0.8rem; font-weight: 600;">Keras BiLSTM</div>
+                </div>
+                <div class="sub-metric-pill">
+                  <div class="sub-metric-title">Latency</div>
+                  <div class="sub-metric-val" id="resLatency" style="font-family: var(--font-mono); color: #34d399;">6.4 ms</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Complete 6-Emotion Breakdown Bars -->
+            <div class="breakdown-header">
+              <span>Full Emotion Breakdown</span>
+              <span style="font-size: 0.75rem; color: var(--text-muted);">Calibrated Probabilities</span>
+            </div>
+
+            <div class="breakdown-list" id="breakdownList">
+              <!-- Dynamically populated meters -->
+            </div>
+
+            <!-- Word-Level Attribution Cloud -->
+            <div class="word-highlights-section" id="wordHighlightBox">
+              <div class="word-highlights-title">Vocabulary & Token Match</div>
+              <div class="words-cloud" id="wordsCloud">
+                <!-- Highlight tags -->
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Comparison View Container (shown when compare_all is chosen) -->
+          <div id="embeddedComparisonBox" style="display: none;">
+            <!-- Rendered by JS -->
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         TAB 2: MODEL COMPARISON MATRIX
+         ==================================================================== -->
+    <div id="tab-comparison" class="tab-content">
+      <div class="glass-card" style="margin-bottom: 2rem;">
+        <div class="card-header-flex">
+          <h2 class="card-title">
+            <span>⚖️ Multi-Model Side-by-Side Comparison</span>
+          </h2>
+          <p style="font-size: 0.88rem; color: var(--text-secondary);">
+            Evaluate model consensus, agreement rates, and latency differences between the Deep Learning neural network and Scikit-learn models.
+          </p>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; margin-bottom: 1.5rem;">
+          <input 
+            type="text" 
+            id="cmpInputText" 
+            class="emotion-textarea" 
+            style="min-height: 52px; height: 52px; padding: 0.85rem 1rem;" 
+            placeholder="Enter a sentence to compare all 3 models..."
+            value="I am terrified of losing everything, but I have to stay strong."
+          >
+          <button class="btn-primary" id="runCompareBtn" style="white-space: nowrap;">
+            Compare All 3 🚀
+          </button>
+        </div>
+
+        <div id="comparisonResultsArea">
+          <!-- Populated dynamically -->
+          <div class="results-empty-state">
+            <div class="empty-icon">⚖️</div>
+            <h3 class="empty-title">Ready for Multi-Model Evaluation</h3>
+            <p class="empty-subtitle">Click "Compare All 3" to benchmark Keras BiLSTM-CNN vs. Logistic Regression vs. Linear SVM.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         TAB 3: BATCH ANALYSIS
+         ==================================================================== -->
+    <div id="tab-batch" class="tab-content">
+      <div class="glass-card" style="margin-bottom: 2rem;">
+        <div class="card-header-flex">
+          <h2 class="card-title">
+            <span>📑 Bulk & Batch Text Emotion Analysis</span>
+          </h2>
+          <span style="font-size: 0.85rem; color: var(--text-muted);">
+            Analyze text files, CSV datasets, or multiple sentences simultaneously
+          </span>
+        </div>
+
+        <!-- Drag & Drop / File Input -->
+        <div class="batch-upload-box" id="dropZone">
+          <div class="batch-upload-icon">📂</div>
+          <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.35rem;">
+            Drag & Drop a .txt or .csv file here, or click to browse
+          </h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+            Supports line-separated text files or single column CSVs
+          </p>
+          <input type="file" id="batchFileInput" accept=".txt,.csv" style="display: none;">
+          <button class="btn-secondary" onclick="document.getElementById('batchFileInput').click()">
+            Select File from Device
+          </button>
+        </div>
+
+        <!-- Or Paste Multiple Lines -->
+        <div style="margin-bottom: 1.5rem;">
+          <label style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 0.4rem;">
+            Or paste multiple lines below (one sentence per line):
+          </label>
+          <textarea id="batchTextarea" class="batch-textarea-paste" placeholder="I feel so happy today!
+I am completely exhausted and sad.
+This unfair treatment makes me so angry!
+I'm terrified of what might happen next.
+I love you with all my heart.
+What an unexpected surprise party!"></textarea>
+          
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="font-size: 0.82rem; color: var(--text-secondary);">Batch Model:</span>
+              <select id="batchModelSelect" style="background: var(--bg-card); border: 1px solid var(--border-subtle); color: #fff; padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.85rem;">
+                <option value="keras">Keras BiLSTM-CNN (Recommended)</option>
+                <option value="logistic">Logistic Regression</option>
+                <option value="svm">Linear SVM</option>
+              </select>
+            </div>
+            <button class="btn-primary" id="runBatchBtn">
+              Run Batch Analysis ⚡
+            </button>
+          </div>
+        </div>
+
+        <!-- Batch Analytics Results -->
+        <div id="batchAnalyticsArea" style="display: none;">
+          <div class="card-header-flex" style="border-top: 1px solid var(--border-subtle); padding-top: 1.5rem;">
+            <h3 style="font-size: 1.1rem; font-weight: 700;">Distribution & Summary</h3>
+            <button class="btn-secondary" id="exportBatchCsvBtn" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">
+              📥 Export CSV
+            </button>
+          </div>
+
+          <div class="batch-dist-grid" id="batchDistGrid">
+            <!-- Populated via JS -->
+          </div>
+
+          <div class="batch-table-container">
+            <table class="batch-table" id="batchTable">
+              <thead>
+                <tr>
+                  <th style="width: 50px;">#</th>
+                  <th>Input Text</th>
+                  <th style="width: 130px;">Predicted Emotion</th>
+                  <th style="width: 100px;">Confidence</th>
+                  <th style="width: 100px;">Sentiment</th>
+                </tr>
+              </thead>
+              <tbody id="batchTableBody">
+                <!-- Rows injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         TAB 4: ARCHITECTURE & INSPECTION
+         ==================================================================== -->
+    <div id="tab-architecture" class="tab-content">
+      <div class="arch-overview-card">
+        <div class="arch-header">
+          <span class="arch-tag">System Model Inspection Report</span>
+          <h2 style="font-family: var(--font-display); font-size: 1.85rem; font-weight: 800; color: #fff; margin: 0.3rem 0 0.6rem;">
+            Trained Models & Prediction Pipeline Specifications
+          </h2>
+          <p style="color: var(--text-secondary); font-size: 0.95rem;">
+            Direct inspection of the provided project files: <code style="color: #c4b5fd;">emotion_model.keras</code>, <code style="color: #c4b5fd;">logistic_regression.joblib</code>, <code style="color: #c4b5fd;">linear_svm.joblib</code>, <code style="color: #c4b5fd;">tfidf.joblib</code>, <code style="color: #c4b5fd;">tokenizer.json</code>, and <code style="color: #c4b5fd;">labels.json</code>.
+          </p>
+        </div>
+
+        <!-- Visual Pipeline Schematic -->
+        <h4 style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.5rem;">
+          Deep Learning Neural Network Pipeline (<code style="color: #34d399;">emotion_model.keras</code>)
+        </h4>
+
+        <div class="arch-pipeline-visual">
+          <div class="pipeline-node">
+            <div class="node-step">Input Stage</div>
+            <div class="node-title">Raw Text</div>
+            <div class="node-sub">User sentence (str)</div>
+          </div>
+          <div class="pipeline-arrow">➔</div>
+
+          <div class="pipeline-node">
+            <div class="node-step">Preprocessing</div>
+            <div class="node-title">Keras Tokenizer</div>
+            <div class="node-sub">30,000 Vocab, &lt;OOV&gt;</div>
+          </div>
+          <div class="pipeline-arrow">➔</div>
+
+          <div class="pipeline-node">
+            <div class="node-step">Sequence Shaping</div>
+            <div class="node-title">pad_sequences</div>
+            <div class="node-sub">maxlen = 60, padding='post'</div>
+          </div>
+          <div class="pipeline-arrow">➔</div>
+
+          <div class="pipeline-node" style="border-color: var(--primary);">
+            <div class="node-step">Word Embeddings</div>
+            <div class="node-title">FastText Embedding</div>
+            <div class="node-sub">100-dim, 1.52M params</div>
+          </div>
+          <div class="pipeline-arrow">➔</div>
+
+          <div class="pipeline-node" style="border-color: var(--purple);">
+            <div class="node-step">Dual Branch Feature Extractor</div>
+            <div class="node-title">Conv1D + BiLSTM</div>
+            <div class="node-sub">128 filters & 64 units</div>
+          </div>
+          <div class="pipeline-arrow">➔</div>
+
+          <div class="pipeline-node" style="border-color: #10b981;">
+            <div class="node-step">Output Dense</div>
+            <div class="node-title">Dense(6, Softmax)</div>
+            <div class="node-sub">6 Emotion Probabilities</div>
+          </div>
+        </div>
+
+        <!-- Classical Models Pipeline Visual -->
+        <h4 style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin: 1.5rem 0 0.5rem;">
+          Classical Machine Learning Pipeline (<code style="color: #38bdf8;">logistic_regression.joblib</code> & <code style="color: #38bdf8;">linear_svm.joblib</code>)
+        </h4>
+
+        <div class="arch-pipeline-visual">
+          <div class="pipeline-node">
+            <div class="node-step">Input Stage</div>
+            <div class="node-title">Raw Text</div>
+            <div class="node-sub">User sentence (str)</div>
+          </div>
+          <div class="pipeline-arrow">➔</div>
+
+          <div class="pipeline-node">
+            <div class="node-step">Feature Extraction</div>
+            <div class="node-title">TF-IDF Vectorizer</div>
+            <div class="node-sub">30,000 features, sublinear tf</div>
+          </div>
+          <div class="pipeline-arrow">➔</div>
+
+          <div class="pipeline-node">
+            <div class="node-step">Linear Classifiers</div>
+            <div class="node-title">LogisticRegression / LinearSVC</div>
+            <div class="node-sub">L2 Regularization</div>
+          </div>
+          <div class="pipeline-arrow">➔</div>
+
+          <div class="pipeline-node" style="border-color: #10b981;">
+            <div class="node-step">Calibrated Output</div>
+            <div class="node-title">Softmax Decision / Proba</div>
+            <div class="node-sub">Probabilities over 6 classes</div>
+          </div>
+        </div>
+
+        <!-- Detailed Specifications Table -->
+        <h4 style="font-size: 0.95rem; font-weight: 700; margin: 2rem 0 0.85rem; color: #fff;">
+          Detailed Model Specifications & Artifacts
+        </h4>
+
+        <table class="specs-table">
+          <thead>
+            <tr>
+              <th>Component</th>
+              <th>Artifact File</th>
+              <th>Type / Dimensions</th>
+              <th>Details & Hyperparameters</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Primary Model</strong></td>
+              <td><code>emotion_model.keras</code> (19.1 MB)</td>
+              <td>Deep Neural Network (4.98M params)</td>
+              <td>FastText 100d Embedding ➔ Conv1D(128, kernel 3) + GlobalMaxPooling1D & Bidirectional LSTM(64) ➔ Concatenate(256) ➔ Dense(64) ➔ Dense(6, Softmax)</td>
+            </tr>
+            <tr>
+              <td><strong>Deep Learning Tokenizer</strong></td>
+              <td><code>tokenizer.json</code> (1.3 MB)</td>
+              <td>Keras Tokenizer config</td>
+              <td>Vocab Size: 30,000 words, OOV token: <code>&lt;OOV&gt;</code>, Trained on 16,000 documents, lowercased, punctuation filtered</td>
+            </tr>
+            <tr>
+              <td><strong>Target Emotion Labels</strong></td>
+              <td><code>labels.json</code> (55 bytes)</td>
+              <td>6 target categories</td>
+              <td><code>["anger", "fear", "joy", "love", "sadness", "surprise"]</code></td>
+            </tr>
+            <tr>
+              <td><strong>Classical Feature Extractor</strong></td>
+              <td><code>tfidf.joblib</code> (1.2 MB)</td>
+              <td>Scikit-Learn TfidfVectorizer</td>
+              <td>30,000 max features, sublinear term frequency scaling, n-gram range (1, 1)</td>
+            </tr>
+            <tr>
+              <td><strong>Logistic Classifier</strong></td>
+              <td><code>logistic_regression.joblib</code> (1.4 MB)</td>
+              <td>LogisticRegression</td>
+              <td>Multinomial cross-entropy, calibrated probability outputs via <code>predict_proba</code></td>
+            </tr>
+            <tr>
+              <td><strong>Support Vector Classifier</strong></td>
+              <td><code>linear_svm.joblib</code> (1.4 MB)</td>
+              <td>LinearSVC</td>
+              <td>Max-margin hyperplane classifier, probability conversion via softmax decision scaling</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Interactive API documentation link card -->
+        <div style="margin-top: 2rem; background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: var(--radius-md); padding: 1.25rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h4 style="font-size: 1rem; color: #fff; margin-bottom: 0.2rem;">RESTful Inference API & OpenAPI Documentation</h4>
+            <p style="font-size: 0.85rem; color: var(--text-secondary);">Test endpoints via Swagger UI or integrate with curl / python requests.</p>
+          </div>
+          <div style="display: flex; gap: 0.6rem;">
+            <a href="/docs" target="_blank" class="btn-primary" style="padding: 0.5rem 1rem; font-size: 0.85rem; text-decoration: none;">
+              Open Swagger Docs (/docs) ↗
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- History Drawer -->
+  <div class="history-sidebar-backdrop" id="historyBackdrop"></div>
+  <aside class="history-drawer" id="historyDrawer">
+    <div class="history-header">
+      <h3 style="font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; color: #fff;">
+        🕒 Recent Analyses
+      </h3>
+      <div style="display: flex; gap: 0.5rem;">
+        <button id="clearHistoryBtn" class="btn-secondary" style="padding: 0.3rem 0.6rem; font-size: 0.75rem;">Clear</button>
+        <button id="closeHistoryBtn" class="icon-btn-round" style="width: 28px; height: 28px;">✖</button>
+      </div>
+    </div>
+    <div class="history-list" id="historyList">
+      <!-- Items dynamically populated -->
+      <div style="text-align: center; color: var(--text-muted); padding: 2rem 0; font-size: 0.85rem;">
+        No analysis history recorded yet.
+      </div>
+    </div>
+  </aside>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container footer-flex">
+      <div>
+        <div style="font-weight: 700; color: #fff; margin-bottom: 0.2rem;">Emotion Recognition System</div>
+        <div>Trained on Twitter/Dair-AI Affective Corpus • Dual-Branch BiLSTM-CNN & TF-IDF ML</div>
+      </div>
+      <div style="display: flex; gap: 1.5rem; align-items: center;">
+        <a href="/docs" target="_blank" style="color: var(--text-secondary); text-decoration: none;">API Documentation</a>
+        <a href="#taxonomyBar" style="color: var(--text-secondary); text-decoration: none;">Emotions Taxonomy</a>
+        <span style="font-family: var(--font-mono); font-size: 0.8rem; color: #34d399;">localhost:8000</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Main JavaScript Logic -->
+  <script src="/static/app.js"></script>
+</body>
+</html>
