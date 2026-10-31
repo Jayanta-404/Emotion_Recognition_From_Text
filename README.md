@@ -18,37 +18,6 @@ It combines a deep learning model (Keras, Conv1D + BiLSTM) with two classical ma
 
 ---
 
-## MOdel  pipeline
- DATA
- ┌─────────────────────────────────────────────┐
- │ 1. Pick labels and datasets                 │  Ekman 6 emotions
- │              ↓                              │
- │ 2. Explore the data                         │  Class counts, text lengths
- │              ↓                              │
- │ 3. Clean the text                           │  Slang, @IDs, lowercase
- │              ↓                              │
- │ 4. Balance and split                        │  Stratified 80:10:10
- └─────────────────────────────────────────────┘
-                     ↓
- MODELS
- ┌─────────────────────────────────────────────┐
- │ 5. Baseline ML models                       │  TF-IDF + Logistic Regression, SVM
- │              ↓                              │
- │ 6. Word embeddings                          │  FastText + emotion vectors
- │              ↓                              │
- │ 7. Main model                               │  BiLSTM + CNN branches
- │              ↓                              │
- │ 8. Tune the model                           │  Dropout, batch size, filters
- └─────────────────────────────────────────────┘
-                     ↓
- DELIVERY
- ┌─────────────────────────────────────────────┐
- │ 9. Evaluate and fix errors                  │  F1, confusion matrix
- │              ↓                              │
- │ 10. Deploy a demo app                       │  FastAPI web app
- └─────────────────────────────────────────────┘
-
-------------
 
 ## Project pipeline
 
